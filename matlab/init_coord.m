@@ -70,11 +70,19 @@ CopperShell.Z = arrayfun(@(phi) (CopperShell.minor_radius * sin(phi)), linspace(
 %% Tokamak's vessel
 Vessel.minor_radius = 0.1; % [m]
 Vessel.major_radius = 0.4; % [m]
-Vessel.Nc  = 1e1;           % number of segments (=coils)
+Vessel.Nc  = 1e2;           % number of segments (=coils)
 Vessel.Nl  = 1;             % number of loops per coil(segment)
 Vessel.R  = arrayfun(@(phi) (Vessel.major_radius + Vessel.minor_radius * cos(phi)), linspace(0,2*pi,Vessel.Nc));
 Vessel.Z  = arrayfun(@(phi) (Vessel.minor_radius * sin(phi)), linspace(0,2*pi,Vessel.Nc));
 Vessel.Id = ones(1, Vessel.Nc); % the currents flowing in the segments have the same direction, which is determined by the direction of Et
+
+% Et~1/R; I_i = 1/R_i*I_tot/sum_j(1/R_j); R..radial coordinate
+R_m1_sum = sum(1./Vessel.R); % sum(R^{-1})
+for i_R = 1:numel(Vessel.R)
+    R_i = Vessel.R(i_R);
+    Vessel.Id(i_R) = 1/R_i*1/R_m1_sum;
+end
+
 Vessel.sc_I = sc_I; Vessel.sc_B = sc_B;
 
 %% Store all the coordinates in a structure 
